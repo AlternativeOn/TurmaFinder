@@ -1,6 +1,12 @@
 <div>
 <h1 align="center"> TurmaFinder </h1>
 </div>
+<p aligin="center">
+<img alt="GitHub all releases" src="https://img.shields.io/github/downloads/alternativeon/turmafinder/total?style=for-the-badge">
+<img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/alternativeon/turmafinder?style=for-the-badge">
+<img alt="GitHub" src="https://img.shields.io/github/license/alternativeon/turmafinder?style=for-the-badge">
+<img src="https://img.shields.io/badge/vers%C3%A3o-windows-success?style=for-the-badge&logo=windows">
+</p>
 Descubra em qual turma você está esse ano.
 
 ## Como saber em qual turma estou?
