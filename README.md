@@ -18,15 +18,18 @@ Descobri isso acidentalmente enquanto fazia webscraping. O positivo on faz uma r
 Essa informação provavelmente é usada na página inicial, mostrado em "aluno do xº ano do ensino fundamental/medio", estranhamente a turma não é mostrada, possivelmente é usada em outras coisas (como determinar as salas virtuais, por exemplo).
 
 ## FAQ
-**Pergunta**: O Chrome disse que o arquivo não costuma ser transferido por download e pode ser perigoso. Você vai me hackear?
+> **Pergunta**: O Chrome disse que o arquivo não costuma ser transferido por download e pode ser perigoso. Você vai me hackear?
+
 **Resposta**: Aplicativos que não estão na "lista branca" do Chrome costumam receber esses alertas, mas são falsos postivos, uma maneira de resolver isso é assinando o código digitalmente, porém por agora é inviavel, por ser algo relativamente caro. E não, eu não tenho intenções, não quero e nem posso te hackear, o código-fonte da aplicação está nesse repositorio de maneira que você possa ler sem necessidade de autorização previa minha.
 ##### [_Saiba mais sobre os avisos do Chrome_](https://support.google.com/chrome/answer/6261569?hl=pt-BR&dark=1#zippy&zippy=#:~:text=Incomum:,desconhecido%20e%20possivelmente%20perigoso.)
 
-**P:** Como posso compilar o arquivo?
+> **P:** Como posso construir o arquivo?
+
 **R:** [Baixe a linguagem Go](https://go.dev) e faça o download desse repositório. Na pasta do repositorio, abra uma janela do CMD ou Powershell e digite: `go mod tidy` (para resolver as dependencias) e depois `go build`. Após a compilação, um arquivo chamado `turmafinder.exe` deve ser gerado.
 
-**P:** Como contribuo para o projeto?
+> **P:** Como contribuo para o projeto?
+
 **R:** Abra uma issue ou crie uma pull request :)
 
-## Licença
+## Licensa
 Este projeto é licenciado para você sobre a licença [BSD 3 Clause](https://choosealicense.com/licenses/bsd-3-clause/).
