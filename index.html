@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://unpkg.com/xp.css" />
+    <title>Windows XP</title>
+  </head>
+  <body style="background-color: #000000">
+    <main>
+      <div class="window" style="height: auto">
+        <div class="title-bar">
+          <div class="title-bar-text">Turma Finder</div>
+          <div class="title-bar-controls">
+            <button aria-label="Help"></button>
+            <button aria-label="Close"></button>
+          </div>
+        </div>
+        <div class="window-body">
+          <p>Vamos verificar em qual turma você está esse ano!</p>
+          <p>
+            Mas para isso, precisamos que você coloque o seu usuário e senha do
+            positivo on, é por ele que conseguimos descobrir a sua turma.
+          </p>
+          <div class="field-row-stacked" style="width: 200px">
+            <label for="user">Usuário</label>
+            <input id="user" type="text" required />
+          </div>
+          <div class="field-row-stacked" style="width: 200px">
+            <label for="pass">Senha</label>
+            <input id="pass" type="password" required />
+          </div>
+          <br />
+          <div class="field-row-stacked" style="width: 200px">
+            <button onclick="login()">Descobrir minha turma</button>
+          </div>
+          <p id="turma" style="visibility: hidden">Sua turma é</p>
+        </div>
+        <div class="status-bar">
+          <p class="status-bar-field" id="status">Pronto</p>
+          <p class="status-bar-field">
+            <progress id="task" value="0" max="100">
+          </p>
+          <p class="status-bar-field">Versão: 1.0</p>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      const ssoExtraParams =
+        "grant_type=password&client_id=hubpsd&client_secret=DA5730D8-90FF-4A41-BFED-147B8E0E2A08&scope=openid%20offline_access%20integration_info";
+
+      function login() {
+        var username = document.getElementById("user").value;
+        var password = document.getElementById("pass").value;
+
+        if (!username || !password) {
+          alert("Preencha todos os campos.");
+        }
+
+        document.getElementById("status").innerHTML = "Carregando...";
+        document.getElementById("task").value = "33";
+
+        var loginRequest = new XMLHttpRequest();
+
+        loginRequest.open(
+          "POST",
+          "https://sso.specomunica.com.br/connect/token",
+          true
+        );
+
+        loginRequest.setRequestHeader(
+          "Content-type",
+          "application/x-www-form-urlencoded"
+        );
+
+        loginRequest.onreadystatechange = () => {
+          if (loginRequest.readyState == 4 && loginRequest.status == 200) {
+            getUserInfo(loginRequest.responseText);
+          } else if (loginRequest.readyState == 4 && loginRequest.status == 400) {
+		  document.getElementById("status").innerHTML = "Falhou!";
+          document.getElementById("task").value = "0";		  
+		  alert("Verifique seu usuário e senha.");
+
+		  }
+        };
+
+        loginRequest.send(
+          `username=${username}&password=${password}&${ssoExtraParams}`
+        );
+      }
+
+      /**
+       * @param {string} jsonToken
+       */
+      function getUserInfo(jsonToken) {
+        document.getElementById("status").innerHTML = "Carregando...";
+        document.getElementById("task").value = "66";
+
+        const userData = JSON.parse(jsonToken);
+
+        const userInfoRequest = new XMLHttpRequest();
+
+        userInfoRequest.open(
+          "GET",
+          "https://sso.specomunica.com.br/connect/userinfo"
+        );
+
+        userInfoRequest.setRequestHeader(
+          "Authorization",
+          "Bearer " + userData.access_token
+        );
+
+        userInfoRequest.send();
+
+        userInfoRequest.onreadystatechange = function () {
+          if (userInfoRequest.readyState == 4 && userInfoRequest.status == 200) {
+            getUserClass(userInfoRequest.responseText, userData.access_token);
+          }
+        };
+      }
+
+      /**
+       * @param {string} rawJsonData
+       * @param {string} token
+       */
+      function getUserClass(rawJsonData, token) {
+        document.getElementById("status").innerHTML = "Carregando...";
+        document.getElementById("task").value = "99";
+
+        const userSchool = JSON.parse(rawJsonData);
+        const userId = JSON.parse(userSchool.schools);
+
+        var userClassRequest = new XMLHttpRequest();
+        var url =
+          "http://apihub.positivoon.com.br/api/NivelEnsino?usuarioId=" +
+          userId.user_id;
+
+        userClassRequest.open("GET", url, true);
+        userClassRequest.setRequestHeader("Authorization", "Bearer " + token);
+        userClassRequest.send();
+
+        userClassRequest.onreadystatechange = function () {
+          if (userClassRequest.readyState == 4 && userClassRequest.status == 200) {
+            finish(userClassRequest.responseText);
+          }
+        };
+      }
+
+      /**
+       * @param {string} userClass
+       */
+      function finish(userClass) {
+        document.getElementById("status").innerHTML = "Sucesso!";
+        document.getElementById("task").value = "100";
+
+        const turmaElement = document.getElementById("turma");
+        const [finalClass] = JSON.parse(userClass);
+
+        turmaElement.innerHTML = `Sua turma é: ${finalClass.turmas[0].nomeTurma}`;
+        turmaElement.style.visibility = "visible";
+      }
+    </script>
+  </body>
+</html>
