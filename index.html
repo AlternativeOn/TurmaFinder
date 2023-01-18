@@ -28,8 +28,8 @@
                </div>
             </div>
             <div class="window-body">
-               <p>Vamos verificar em qual turma você está esse ano!</p>
-               <p>
+               <p style="font-size:12px;">Vamos verificar em qual turma você está esse ano!</p>
+               <p style="font-size:12px;">
                   Mas para isso, precisamos que você coloque o seu usuário e senha do
                   positivo on, é por ele que conseguimos descobrir a sua turma.
                </p>
@@ -61,10 +61,10 @@
                </div>
                <hr>
                <h4> Como funciona? </h4>
-               <p> Usamos a api do Positivo On para identificarmos em qual turma você está, para isso usamos o endpoint <code>https://apihub.positivoon.com.br/api/NivelEnsino</code>
+               <p style="font-size:12px;"> Usamos a api do Positivo On para identificarmos em qual turma você está, para isso usamos o endpoint <code>https://apihub.positivoon.com.br/api/NivelEnsino</code>
 				em que é retornado o nível de ensino do usuário.</p>
-				<p> Tudo o processo é feito no navegador, então nenhum dado é coletado e nem enviado para nossos servidores.</p>
-				<p> Se você quiser saber como funciona, veja no nosso repositório no GitHub <p>
+				<p style="font-size:12px;"> Tudo o processo é feito no navegador, então nenhum dado é coletado e nem enviado para nossos servidores.</p>
+				<p style="font-size:12px;"> Se você quiser saber como funciona, veja no nosso repositório no GitHub <p>
 				<button onclick="location.href='https://github.com/AlternativeOn/TurmaFinder/blob/web/README.md';">Ver como funciona</button>
             </div>
             <div class="status-bar">
@@ -86,6 +86,7 @@
          
            if (!username || !password) {
              alert("Preencha todos os campos.");
+	     throw new Error("Nem todos os campos foram preenchidos.");
            }
          
            document.getElementById("status").innerHTML = "Carregando...";
@@ -111,6 +112,7 @@
          document.getElementById("status").innerHTML = "Falhou!";
              document.getElementById("task").value = "0";		  
          alert("Verifique seu usuário e senha.");
+		     throw new Error("Usuário ou senha errados.");
          
          }
            };
