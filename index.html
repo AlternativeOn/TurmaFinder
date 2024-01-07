@@ -1,204 +1,222 @@
 <!DOCTYPE html>
 <html>
-   <head>
-      <link rel="stylesheet" href="https://unpkg.com/xp.css" />
-      <title>Turma Finder</title>
-	<meta name="author" content="Alternative On">
-	<meta name="theme-color" content="#0061fb">
-	<meta name="url" content="https://turma.princessmortix.link">
-	<meta name="og:url" content="https://turma.princessmortix.link">
-	<meta name="og:see_also" content="https://turma.princessmortix.link">
-	<meta name="twitter:url" content="https://turma.princessmortix.link">
-	<meta name="og:site_name" content="turma.princessmortix.link">
-	<meta name="name" content="Encontre sua turma!">
-	<meta name="og:title" content="Encontre sua turma!">
-	<meta name="twitter:title" content="Encontre sua turma!">
-	<meta name="description" content="TurmaFinder é um site da internet que te ajuda a encontra a sua turma pelo Positivo On.">
-	<meta name="og:description" content="TurmaFinder é um site da internet que te ajuda a encontra a sua turma pelo Positivo On.">
-	<meta name="twitter:description" content="TurmaFinder é um site da internet que te ajuda a encontra a sua turma pelo Positivo On.">
-   </head>
-   <body style="background-color: #000000">
-      <main>
-         <div class="window" style="height: auto">
-            <div class="title-bar">
-               <div class="title-bar-text">Turma Finder</div>
-               <div class="title-bar-controls">
-                  <button aria-label="Help" onclick="location.href='https://github.com/AlternativeOn/TurmaFinder/blob/web/README.md';"></button>
-                  <button aria-label="Close" onclick="window.open('','_self').close();"></button>
-               </div>
-            </div>
-            <div class="window-body">
-               <p style="font-size:12px;">Vamos verificar em qual turma você está esse ano!</p>
-               <p style="font-size:12px;">
-                  Mas para isso, precisamos que você coloque o seu usuário e senha do
-                  positivo on, é por ele que conseguimos descobrir a sua turma.
-               </p>
-               <div class="field-row-stacked" style="width: 200px">
-                  <label for="user">Usuário</label>
-                  <input id="user" type="text" required />
-               </div>
-               <div class="field-row-stacked" style="width: 200px">
-                  <label for="pass">Senha</label>
-                  <input id="pass" type="password" required />
-               </div>
-               <br />
-               <div class="field-row-stacked" style="width: 200px">
-                  <button onclick="login()">Descobrir minha turma</button>
-               </div>
-               <br>
-               <div class="window" id="window" style="width: 300px; visibility: hidden">
-                  <div class="title-bar">
-                     <div class="title-bar-text">Sucesso!</div>
-                     <div class="title-bar-controls">
-                        <button onclick="hide()" aria-label="Close"></button>
-                     </div>
-                  </div>
-                  <div class="window-body">
-                     <p id="turma" style="visibility: hidden">Sua turma é</p>
-					 
-					 <p align="center"> <button onclick="hide()"> Fechar </button> </p>
-                  </div>
-               </div>
-               <hr>
-               <h4> Como funciona? </h4>
-               <p style="font-size:12px;"> Usamos a api do Positivo On para identificarmos em qual turma você está, para isso usamos o endpoint <code>https://apihub.positivoon.com.br/api/NivelEnsino</code>
-				em que é retornado o nível de ensino do usuário.</p>
-				<p style="font-size:12px;"> Tudo o processo é feito no navegador, então nenhum dado é coletado e nem enviado para nossos servidores.</p>
-				<p style="font-size:12px;"> Se você quiser saber como funciona, veja no nosso repositório no GitHub <p>
-				<button onclick="location.href='https://github.com/AlternativeOn/TurmaFinder/blob/web/README.md';">Ver como funciona</button>
-            </div>
-            <div class="status-bar">
-               <p class="status-bar-field" id="status">Pronto</p>
-               <p class="status-bar-field">
-                  <progress id="task" value="0" max="100">
-               </p>
-               <p class="status-bar-field">Versão: 1.1</p>
-            </div>
-         </div>
-      </main>
-      <script>
-         const ssoExtraParams =
-           "grant_type=password&client_id=hubpsd&client_secret=DA5730D8-90FF-4A41-BFED-147B8E0E2A08&scope=openid%20offline_access%20integration_info";
-         
-         function login() {
-           var username = document.getElementById("user").value;
-           var password = document.getElementById("pass").value;
-         
-           if (!username || !password) {
-             alert("Preencha todos os campos.");
-	     throw new Error("Nem todos os campos foram preenchidos.");
-           }
-         
-           document.getElementById("status").innerHTML = "Carregando...";
-           document.getElementById("task").value = "33";
-         
-           var loginRequest = new XMLHttpRequest();
-         
-           loginRequest.open(
-             "POST",
-             "https://sso.specomunica.com.br/connect/token",
-             true
-           );
-         
-           loginRequest.setRequestHeader(
-             "Content-type",
-             "application/x-www-form-urlencoded"
-           );
-         
-           loginRequest.onreadystatechange = () => {
-             if (loginRequest.readyState == 4 && loginRequest.status == 200) {
-               getUserInfo(loginRequest.responseText);
-             } else if (loginRequest.readyState == 4 && loginRequest.status == 400) {
-         document.getElementById("status").innerHTML = "Falhou!";
-             document.getElementById("task").value = "0";		  
-         alert("Verifique seu usuário e senha.");
-		     throw new Error("Usuário ou senha errados.");
-         
-         }
-           };
-         
-           loginRequest.send(
-             `username=${username}&password=${password}&${ssoExtraParams}`
-           );
-         }
-         
-         /**
-          * @param {string} jsonToken
-          */
-         function getUserInfo(jsonToken) {
-           document.getElementById("status").innerHTML = "Carregando...";
-           document.getElementById("task").value = "66";
-         
-           const userData = JSON.parse(jsonToken);
-         
-           const userInfoRequest = new XMLHttpRequest();
-         
-           userInfoRequest.open(
-             "GET",
-             "https://sso.specomunica.com.br/connect/userinfo"
-           );
-         
-           userInfoRequest.setRequestHeader(
-             "Authorization",
-             "Bearer " + userData.access_token
-           );
-         
-           userInfoRequest.send();
-         
-           userInfoRequest.onreadystatechange = function () {
-             if (userInfoRequest.readyState == 4 && userInfoRequest.status == 200) {
-               getUserClass(userInfoRequest.responseText, userData.access_token);
+
+<head>
+    <title>Turma Finder</title>
+    <meta name="author" content="Alternative On">
+    <meta name="theme-color" content="#0061fb">
+    <meta name="url" content="https://turma.princessmortix.link">
+    <meta name="og:url" content="https://turma.princessmortix.link">
+    <meta name="og:see_also" content="https://turma.princessmortix.link">
+    <meta name="twitter:url" content="https://turma.princessmortix.link">
+    <meta name="og:site_name" content="turma.princessmortix.link">
+    <meta name="name" content="Encontre sua turma!">
+    <meta name="og:title" content="Encontre sua turma!">
+    <meta name="twitter:title" content="Encontre sua turma!">
+    <meta name="description"
+        content="TurmaFinder é um site da internet que te ajuda a encontra a sua turma pelo Positivo On.">
+    <meta name="og:description"
+        content="TurmaFinder é um site da internet que te ajuda a encontra a sua turma pelo Positivo On.">
+    <meta name="twitter:description"
+        content="TurmaFinder é um site da internet que te ajuda a encontra a sua turma pelo Positivo On.">
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap');
+
+        * {
+            font-family: 'Noto Sans';
+        }
+
+        body {
+            background-image: linear-gradient(90deg, #776BCC 0%, #C7C5F4 100%);
+            background-size: 400% 400%;
+            -webkit-animation: gradient 40s ease infinite;
+            animation: gradient 40s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+             50% {
+                background-position: 100% 50%;
              }
-           };
-         }
-         
-         /**
-          * @param {string} rawJsonData
-          * @param {string} token
-          */
-         function getUserClass(rawJsonData, token) {
-           document.getElementById("status").innerHTML = "Carregando...";
-           document.getElementById("task").value = "99";
-         
-           const userSchool = JSON.parse(rawJsonData);
-           const userId = JSON.parse(userSchool.schools);
-         
-           var userClassRequest = new XMLHttpRequest();
-           var url =
-             "https://cors-proxy.princessmortix.workers.dev/proxy/?apiurl=https://apihub.positivoon.com.br/api/NivelEnsino?usuarioId=" +
-             userId.user_id;
-         
-           userClassRequest.open("GET", url, true);
-           userClassRequest.setRequestHeader("Authorization", "Bearer " + token);
-           userClassRequest.send();
-         
-           userClassRequest.onreadystatechange = function () {
-             if (userClassRequest.readyState == 4 && userClassRequest.status == 200) {
-               finish(userClassRequest.responseText);
-             }
-           };
-         }
-         
-         /**
-          * @param {string} userClass
-          */
-         function finish(userClass) {
-           document.getElementById("status").innerHTML = "Sucesso!";
-           document.getElementById("task").value = "100";
-         
-           const turmaElement = document.getElementById("turma");
-		   const windowElement = document.getElementById("window");
-           const [finalClass] = JSON.parse(userClass);
-         
-           turmaElement.innerHTML = `Sua turma é: ${finalClass.turmas[0].nomeTurma}`;
-           turmaElement.style.visibility = "visible";
-		   windowElement.style.visibility = "visible";
-         }
-		 
-		 function hide() {
-		   document.getElementById("turma").style.visibility = "hidden";
-		   document.getElementById("window").style.visibility = "hidden";
-		 }
-      </script>
-   </body>
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .loginbox {
+            margin: auto;
+            width: 50%;
+            border: 2px solid grey;
+            padding: 2%;
+            background: linear-gradient(45deg, #C7C5F4, #776BCC);
+            background-size: 400% 400%;
+            -webkit-animation: gradient 40s ease infinite;
+            animation: gradient 40s ease infinite;
+            border-radius: 25px;
+            transform: translate(-50%, -50%);
+            left: 50%;
+            top: 50%;
+            position: absolute;
+        }
+
+
+
+        .loginfield {
+            padding: 20px 0px;
+            position: relative;
+        }
+
+        .logininput {
+            border: none;
+            border-bottom: 2px solid #D1D1D4;
+            background: none;
+            padding: 10px;
+            padding-left: 24px;
+            font-weight: 700;
+            width: 90%;
+            transition: .2s;
+        }
+
+        .logininput:active,
+        .logininput:focus,
+        .logininput:hover {
+            outline: none;
+            border-bottom-color: #6A679E;
+        }
+
+        .logingo {
+            background: #fff;
+            font-size: 14px;
+            padding: 16px 20px;
+            border-radius: 26px;
+            border: 1px solid #D4D3E8;
+            text-transform: uppercase;
+            font-weight: 700;
+            display: block;
+            align-items: center;
+            width: 100%;
+            color: #4C489D;
+            box-shadow: 0px 2px 2px #5C5696;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .feather {
+            position: absolute;
+            top: 30px;
+            color: #776BCC;
+            width: 20px;
+            height: 20px;
+        }
+
+        .footer {
+            font-size: 12px;
+            text-align: center;
+        }
+        a, a:visited, a:link {
+                text-decoration: none;
+                color: slateblue;
+        }
+
+        .error {
+            color: red;
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="loginbox" id="messagecontrol">
+        <h2 id="msgtitle">Faça seu login</h2>
+        <p id="msginfo">Assim você pode saber em qual turma você está em 2024.</p>
+        <form class="loginform" id="form">
+            <div class="loginfield">
+                <i data-feather="user"></i>
+                <input type="text" class="logininput" placeholder="Usuário do Positivo On" required id="username">
+            </div>
+            <div class="loginfield">
+                <i data-feather="key" ></i>
+                <input type="password" class="logininput" placeholder="Senha do Positivo On" required id="password">
+            </div>
+        </form>
+        <button class="logingo" onclick="login()" id="btn">Ver minha turma!</button>
+        <p class="footer">AlternativeOn // <a href="https://github.com/AlternativeOn/TurmaFinder/tree/web?tab=readme-ov-file#como-funciona" target="_blank">Como funciona?</a></p>
+    </div>
+
+    <script>
+        feather.replace();
+        var msgc = document.getElementById("form");
+        var msg = document.getElementById("msgtitle");
+        var detailmsg = document.getElementById("msginfo");
+        var btnmsg = document.getElementById("btn");
+        var username = document.getElementById("username");
+        var password = document.getElementById("password");
+
+        async function login() {
+            if (username.value == "" || password.value == "") {
+                detailmsg.innerHTML += "<p class='error'>O usuário e/ou senha estão em branco!</p>"
+                return
+            }
+            
+
+            var reqHeaders = new Headers();
+
+            reqHeaders.append("Content-Type", "application/json");
+
+
+            var raw = JSON.stringify({
+                "username": username.value,
+                "password": password.value,
+                "realm": "eem"
+            });
+
+            var requestOptions = {
+                method: 'POST',
+                headers: reqHeaders,
+                body: raw,
+                redirect: 'follow',
+            };
+
+            msgc.style.display = "none";
+            msg.innerText = "Carregando...";
+            detailmsg.innerText = "Aguarde um curto momento";
+            btnmsg.style.display = "none";
+
+
+            const response = await fetch("https://proxy-turma-finder.princessmortix.workers.dev/https://portal-bff.positivoon.com.br/login", requestOptions)
+            .catch(error => wentWrong(error))
+            if (!response.ok) {
+                wentWrong(response.statusText)
+            }
+            
+
+            const result = await response.json();
+            console.log("sucess:", result);
+
+            var pal = result.accounts.length - 1;
+            var cls = result.accounts[pal].classrooms.length - 1;
+            var turma = result.accounts[pal].classrooms[cls].classroom.name.toString().substring(2);
+            var nomeAlto = result.firstName.split(" ")[0];
+            var nomeBaixo = nomeAlto.toLowerCase();
+            var nome = nomeBaixo.charAt(0).toUpperCase() + nomeBaixo.slice(1);
+
+            msg.innerText = "Você será da turma " + turma + ","
+            detailmsg.innerText = "de acordo com a ultima atualização do Positivo On. É possivel que esse valor não tenha sido ainda alterado.\n" + `Boa sorte nos estudos, ${nome}! 👋`
+        }
+        
+
+        function wentWrong(detailError) {
+            msgc.style.display = "none";
+            msg.innerText = "Algo deu errado!";
+            detailmsg.innerText = "Verifique se o usuário e senha está corretos, e tente novamente.\nDetalhe do erro: " + detailError;
+            btnmsg.innerText = "Tentar novamente...";
+            btnmsg.innerHTML = "<button class='logingo' onclick='location.reload()'>Tentar de novo</button>"
+        }
+    </script>
+</body>
+
 </html>
