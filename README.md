@@ -3,6 +3,10 @@
 Descubra em qual turma você está esse ano.
 </div>
 
+---
+Arquivamento do projeto: Essa foi a ultima vez que atualizo esse site, já que não estudo mais em uma escola com o sistema de ensino Positivo. Agradeço por usar meus aplicativos e sites!
+---
+
 ## Como funciona?
 De uma maneira bem simples, o positivo on tem os dados do seu perfil de usuário, e nele tem qual turma você está. Essa informação é usada nas mensagens e tambem na salas virtuais.
 
@@ -11,19 +15,9 @@ Se você quer entender mais a fundo como o site funciona, continue lendo abaixo.
 ****
 
 ## Como realmente funciona?
-Começando pelo o inicio... é necessário enviar uma solicitação para `https://sso.specomunica.com.br/connect/token` com o usuário e senha, e com isso iremos obter a token do usuário.
+Começando pelo o inicio... é necessário enviar uma solicitação para `https://portal-bff.positivoon.com.br/login` com o usuário e senha, e com isso iremos obter todos os dados ncessários, incluindo o nome do aluno e as turmas cadrastadas. Com essa nova API fica muito mais fácil procurar a turma.
 
-Com a token "em mãos", precisamos agora enviar outra solicitação para `https://sso.specomunica.com.br/connect/userinfo` (com a token, da primeira requisição) para obtermos o id do usuário.
-
-E por fim, enviamos a última solicitação para `https://apihub.positivoon.com.br/api/NivelEnsino`, com a token e o id do usuário, e nisso obtemos uma resposta parecida com:
-
-```json
-[{"value":"EM","label":"Ensino Médio","turmas":[{"nomeTurma":"21301","turmaValida":true,"nomeSerie":"3ª série"}]}]
-```
-
-Aonde "nomeTurma" é aonde tem a turma em que o usuário está cadrastado.
-
-Porém, enquanto desenvolvia o site, tive um problema com CORS na última requisição necessária, então tive que fazer uma Proxy Cors usando o Cloudflare Workers, veja o código usado a seguir.
+O problema do CORS continua o mesmo, então novamente criei uma proxy usando o código abaixo:
 
 ```js
 async function handleRequest(request) {
